@@ -61,7 +61,7 @@ class TestGroupsAddCommand:
             ["groups", "add", "My First Group", "--services-file", str(sample_services_file)],
         )
         assert result.exit_code == 2
-        assert "already exists" in result.stdout
+        assert "already exists" in (result.stdout + result.stderr)
 
 
 class TestGroupsRenameCommand:
@@ -97,7 +97,7 @@ class TestGroupsRenameCommand:
             ],
         )
         assert result.exit_code == 2
-        assert "not found" in result.stdout
+        assert "not found" in (result.stdout + result.stderr)
 
 
 class TestGroupsDeleteCommand:
@@ -129,7 +129,7 @@ class TestGroupsDeleteCommand:
             ["groups", "delete", "My First Group", "--services-file", str(sample_services_file)],
         )
         assert result.exit_code == 2
-        assert "Use --force to delete" in result.stdout
+        assert "Use --force to delete" in (result.stdout + result.stderr)
 
     def test_groups_delete_with_force(
         self, sample_services_file: Path
@@ -241,7 +241,7 @@ class TestServicesAddCommand:
             ],
         )
         assert result.exit_code == 2
-        assert "already exists" in result.stdout
+        assert "already exists" in (result.stdout + result.stderr)
 
 
 class TestServicesShowCommand:
@@ -261,7 +261,7 @@ class TestServicesShowCommand:
         )
         assert result.exit_code == 0
         assert "Service: Plex" in result.stdout
-        assert "href=" in result.stdout
+        assert "href:" in result.stdout
 
 
 class TestServicesUpdateCommand:

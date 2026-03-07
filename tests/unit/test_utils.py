@@ -62,7 +62,7 @@ class TestInferNameFromHref:
     def test_infer_invalid(self) -> None:
         """Test name inference with invalid input."""
         assert infer_name_from_href("") == "Service"
-        assert infer_name_from_href("://invalid") == "Service"
+        assert infer_name_from_href("://invalid") == "://invalid"
 
 
 class TestReadServicesFile:

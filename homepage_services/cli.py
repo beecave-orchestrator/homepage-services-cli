@@ -23,13 +23,47 @@ from homepage_services.utils import (
     validate_services_file,
     write_services_file,
 )
+from homepage_services.bookmarks_utils import (
+    DEFAULT_BOOKMARKS_FILE,
+    bookmark_entry_tuple,
+    ensure_bookmark_group,
+    find_bookmark,
+    find_bookmark_group_index,
+    print_bookmarks,
+    read_bookmarks_file,
+    validate_bookmarks_file,
+    write_bookmarks_file,
+)
+from homepage_services.settings_utils import (
+    DEFAULT_SETTINGS_FILE,
+    LayoutGroup,
+    print_settings,
+    read_settings_file,
+    Settings,
+    validate_settings_file,
+    write_settings_file,
+)
+from homepage_services.docker_utils import (
+    DEFAULT_DOCKER_FILE,
+    find_docker_instance,
+    print_docker_instances,
+    read_docker_file,
+    validate_docker_file,
+    write_docker_file,
+)
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 groups_app = typer.Typer(no_args_is_help=True)
 services_app = typer.Typer(no_args_is_help=True)
+bookmarks_app = typer.Typer(no_args_is_help=True)
+settings_app = typer.Typer(no_args_is_help=True)
+docker_app = typer.Typer(no_args_is_help=True)
 
 app.add_typer(groups_app, name="groups")
 app.add_typer(services_app, name="services")
+app.add_typer(bookmarks_app, name="bookmarks")
+app.add_typer(settings_app, name="settings")
+app.add_typer(docker_app, name="docker")
 
 
 # ---------- Root commands ----------
@@ -472,6 +506,748 @@ def services_set_field(
     cur[parts[-1]] = value
     write_services_file(services_file, groups)
     print(f"Set {name}.{key} = {value}")
+
+
+# ---------- Bookmarks commands ----------
+
+
+@bookmarks_app.command("validate")
+def bookmarks_validate(
+    bookmarks_file: Path = typer.Option(
+        DEFAULT_BOOKMARKS_FILE, help="Path to bookmarks.yaml"
+    ),
+) -> None:
+    """Validate that bookmarks.yaml matches the expected structure.
+
+    Args:
+        bookmarks_file: Path to the bookmarks.yaml file to validate.
+    """
+    errors = validate_bookmarks_file(bookmarks_file)
+
+    if errors:
+        print("Validation failed:")
+        for e in errors:
+            print(f"- {e}")
+        raise Exit(code=2)
+
+    print("OK: bookmarks.yaml structure looks valid.")
+
+
+@bookmarks_app.command("list")
+def bookmarks_list(
+    group: Optional[str] = typer.Option(
+        None, help="If set, list only this group"
+    ),
+    bookmarks_file: Path = typer.Option(
+        DEFAULT_BOOKMARKS_FILE, help="Path to bookmarks.yaml"
+    ),
+) -> None:
+    """List bookmarks, optionally filtered by group.
+
+    Args:
+        group: Optional group name to filter by.
+        bookmarks_file: Path to the bookmarks.yaml file.
+    """
+    groups = read_bookmarks_file(bookmarks_file)
+    print_bookmarks(groups, group=group)
+
+
+@bookmarks_app.command("add")
+def bookmarks_add(
+    url: str = typer.Option(..., help="Bookmark URL (href)"),
+    group: str = typer.Option(..., help="Group name to add into"),
+    name: Optional[str] = typer.Option(
+        None, help="Bookmark display name (defaults to URL hostname)"
+    ),
+    abbr: Optional[str] = typer.Option(None, help="Abbreviation"),
+    icon: Optional[str] = typer.Option(None, help="Icon reference"),
+    description: Optional[str] = typer.Option(None, help="Bookmark description"),
+    bookmarks_file: Path = typer.Option(
+        DEFAULT_BOOKMARKS_FILE, help="Path to bookmarks.yaml"
+    ),
+) -> None:
+    """Add a new bookmark to a group.
+
+    Args:
+        url: Bookmark URL.
+        group: Group name to add the bookmark to.
+        name: Bookmark display name.
+        abbr: Abbreviation.
+        icon: Icon reference.
+        description: Bookmark description.
+        bookmarks_file: Path to the bookmarks.yaml file.
+
+    Raises:
+        BadParameter: If the bookmark name already exists.
+    """
+    from homepage_services.utils import infer_name_from_href
+
+    groups = read_bookmarks_file(bookmarks_file)
+    bookmark_name = name or infer_name_from_href(url)
+    if find_bookmark(groups, bookmark_name) is not None:
+        raise BadParameter(
+            f"Bookmark '{bookmark_name}' already exists (bookmark names must be unique)."
+        )
+    idx = ensure_bookmark_group(groups, group)
+    bookmark_list = groups[idx][group]
+    config: dict[str, any] = {"href": url}
+    if abbr:
+        config["abbr"] = abbr
+    if icon:
+        config["icon"] = icon
+    if description:
+        config["description"] = description
+    bookmark_list.append({bookmark_name: config})
+    write_bookmarks_file(bookmarks_file, groups)
+    print(f"Added bookmark '{bookmark_name}' to group '{group}'.")
+
+
+@bookmarks_app.command("show")
+def bookmarks_show(
+    group: str = typer.Argument(..., help="Group name"),
+    name: str = typer.Argument(..., help="Bookmark name"),
+    bookmarks_file: Path = typer.Option(
+        DEFAULT_BOOKMARKS_FILE, help="Path to bookmarks.yaml"
+    ),
+) -> None:
+    """Show detailed information about a bookmark.
+
+    Args:
+        group: Group name.
+        name: Bookmark name.
+        bookmarks_file: Path to the bookmarks.yaml file.
+
+    Raises:
+        BadParameter: If the bookmark is not found.
+    """
+    groups = read_bookmarks_file(bookmarks_file)
+    group_idx = find_bookmark_group_index(groups, group)
+    if group_idx is None:
+        raise BadParameter(f"Group '{group}' not found.")
+
+    bookmark_list = groups[group_idx][group]
+    if not isinstance(bookmark_list, list):
+        raise BadParameter(f"Group '{group}' is not a list.")
+
+    found = None
+    for entry in bookmark_list:
+        t = bookmark_entry_tuple(entry)
+        if t and t[0] == name:
+            found = t
+            break
+
+    if not found:
+        raise BadParameter(f"Bookmark '{name}' not found in group '{group}'.")
+
+    bookmark_name, cfg = found
+    print(f"Bookmark: {bookmark_name}")
+    print(f"Group: {group}")
+    for k, v in cfg.items():
+        print(f"- {k}: {v}")
+
+
+@bookmarks_app.command("update")
+def bookmarks_update(
+    group: str = typer.Argument(..., help="Group name"),
+    name: str = typer.Argument(..., help="Bookmark name"),
+    url: Optional[str] = typer.Option(None, help="New URL"),
+    abbr: Optional[str] = typer.Option(None, help="New abbreviation"),
+    icon: Optional[str] = typer.Option(None, help="New icon reference"),
+    description: Optional[str] = typer.Option(None, help="New description"),
+    bookmarks_file: Path = typer.Option(
+        DEFAULT_BOOKMARKS_FILE, help="Path to bookmarks.yaml"
+    ),
+) -> None:
+    """Update a bookmark's properties.
+
+    Args:
+        group: Group name.
+        name: Bookmark name.
+        url: New URL.
+        abbr: New abbreviation.
+        icon: New icon reference.
+        description: New description.
+        bookmarks_file: Path to the bookmarks.yaml file.
+
+    Raises:
+        BadParameter: If the bookmark is not found.
+    """
+    groups = read_bookmarks_file(bookmarks_file)
+    group_idx = find_bookmark_group_index(groups, group)
+    if group_idx is None:
+        raise BadParameter(f"Group '{group}' not found.")
+
+    bookmark_list = groups[group_idx][group]
+    if not isinstance(bookmark_list, list):
+        raise BadParameter(f"Group '{group}' is not a list.")
+
+    found = None
+    bookmark_idx = None
+    for idx, entry in enumerate(bookmark_list):
+        t = bookmark_entry_tuple(entry)
+        if t and t[0] == name:
+            found = t
+            bookmark_idx = idx
+            break
+
+    if not found or bookmark_idx is None:
+        raise BadParameter(f"Bookmark '{name}' not found in group '{group}'.")
+
+    _, cfg = found
+    if url is not None:
+        cfg["href"] = url
+    if abbr is not None:
+        cfg["abbr"] = abbr
+    if icon is not None:
+        cfg["icon"] = icon
+    if description is not None:
+        cfg["description"] = description
+
+    write_bookmarks_file(bookmarks_file, groups)
+    print(f"Updated bookmark '{name}' in group '{group}'.")
+
+
+@bookmarks_app.command("rename")
+def bookmarks_rename(
+    group: str = typer.Argument(..., help="Group name"),
+    old: str = typer.Argument(..., help="Existing bookmark name"),
+    new: str = typer.Argument(..., help="New bookmark name"),
+    bookmarks_file: Path = typer.Option(
+        DEFAULT_BOOKMARKS_FILE, help="Path to bookmarks.yaml"
+    ),
+) -> None:
+    """Rename a bookmark.
+
+    Args:
+        group: Group name.
+        old: Current name of the bookmark.
+        new: New name for the bookmark.
+        bookmarks_file: Path to the bookmarks.yaml file.
+
+    Raises:
+        BadParameter: If the bookmark is not found or the new name already exists.
+    """
+    groups = read_bookmarks_file(bookmarks_file)
+
+    # Check if new name already exists in any group
+    if find_bookmark(groups, new) is not None:
+        raise BadParameter(f"Bookmark '{new}' already exists.")
+
+    group_idx = find_bookmark_group_index(groups, group)
+    if group_idx is None:
+        raise BadParameter(f"Group '{group}' not found.")
+
+    bookmark_list = groups[group_idx][group]
+    if not isinstance(bookmark_list, list):
+        raise BadParameter(f"Group '{group}' is not a list.")
+
+    found = None
+    bookmark_idx = None
+    for idx, entry in enumerate(bookmark_list):
+        t = bookmark_entry_tuple(entry)
+        if t and t[0] == old:
+            found = t
+            bookmark_idx = idx
+            break
+
+    if not found or bookmark_idx is None:
+        raise BadParameter(f"Bookmark '{old}' not found in group '{group}'.")
+
+    _, cfg = found
+    bookmark_list[bookmark_idx] = {new: cfg}
+    write_bookmarks_file(bookmarks_file, groups)
+    print(f"Renamed bookmark '{old}' -> '{new}' in group '{group}'.")
+
+
+@bookmarks_app.command("delete")
+def bookmarks_delete(
+    group: str = typer.Argument(..., help="Group name"),
+    name: str = typer.Argument(..., help="Bookmark name"),
+    bookmarks_file: Path = typer.Option(
+        DEFAULT_BOOKMARKS_FILE, help="Path to bookmarks.yaml"
+    ),
+) -> None:
+    """Delete a bookmark from its group.
+
+    Args:
+        group: Group name.
+        name: Name of the bookmark to delete.
+        bookmarks_file: Path to the bookmarks.yaml file.
+
+    Raises:
+        BadParameter: If the bookmark is not found.
+    """
+    groups = read_bookmarks_file(bookmarks_file)
+    group_idx = find_bookmark_group_index(groups, group)
+    if group_idx is None:
+        raise BadParameter(f"Group '{group}' not found.")
+
+    bookmark_list = groups[group_idx][group]
+    if not isinstance(bookmark_list, list):
+        raise BadParameter(f"Group '{group}' is not a list.")
+
+    found_idx = None
+    for idx, entry in enumerate(bookmark_list):
+        t = bookmark_entry_tuple(entry)
+        if t and t[0] == name:
+            found_idx = idx
+            break
+
+    if found_idx is None:
+        raise BadParameter(f"Bookmark '{name}' not found in group '{group}'.")
+
+    bookmark_list.pop(found_idx)
+    write_bookmarks_file(bookmarks_file, groups)
+    print(f"Deleted bookmark '{name}' from group '{group}'.")
+
+
+# ---------- Settings commands ----------
+
+
+@settings_app.command("validate")
+def settings_validate(
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """Validate that settings.yaml matches the expected structure.
+
+    Args:
+        settings_file: Path to the settings.yaml file to validate.
+    """
+    errors = validate_settings_file(settings_file)
+
+    if errors:
+        print("Validation failed:")
+        for e in errors:
+            print(f"- {e}")
+        raise Exit(code=2)
+
+    print("OK: settings.yaml structure looks valid.")
+
+
+@settings_app.command("set")
+def settings_set(
+    title: Optional[str] = typer.Option(None, help="Set title"),
+    theme: Optional[str] = typer.Option(None, help="Set theme"),
+    color: Optional[str] = typer.Option(None, help="Set color"),
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """Set global settings.
+
+    Args:
+        title: Homepage title.
+        theme: Theme (e.g., dark, light).
+        color: Color scheme.
+        settings_file: Path to the settings.yaml file.
+    """
+    data = read_settings_file(settings_file)
+    if title is not None:
+        data["title"] = title
+    if theme is not None:
+        data["theme"] = theme
+    if color is not None:
+        data["color"] = color
+    write_settings_file(settings_file, data)
+    print("Settings updated.")
+
+
+@settings_app.command("get")
+def settings_get(
+    key: Optional[str] = typer.Argument(None, help="Key to get (title|theme|color)"),
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """Get a setting value.
+
+    Args:
+        key: Setting key to get.
+        settings_file: Path to the settings.yaml file.
+    """
+    data = read_settings_file(settings_file)
+    settings = Settings.from_dict(data)
+
+    if key:
+        if key == "title" and settings.title:
+            print(settings.title)
+        elif key == "theme" and settings.theme:
+            print(settings.theme)
+        elif key == "color" and settings.color:
+            print(settings.color)
+        else:
+            print(f"Key '{key}' not set or invalid.")
+    else:
+        print_settings(settings)
+
+
+@settings_app.command("list")
+def settings_list(
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """List all settings.
+
+    Args:
+        settings_file: Path to the settings.yaml file.
+    """
+    data = read_settings_file(settings_file)
+    settings = Settings.from_dict(data)
+    print_settings(settings)
+
+
+# ---------- Providers commands (sub-command of settings) ----------
+
+
+providers_app = typer.Typer(no_args_is_help=True)
+settings_app.add_typer(providers_app, name="providers")
+
+
+@providers_app.command("add")
+def providers_add(
+    service: str = typer.Argument(..., help="Service name (e.g., openweathermap)"),
+    key: str = typer.Argument(..., help="API key"),
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """Add a provider with an API key.
+
+    Args:
+        service: Service name.
+        key: API key.
+        settings_file: Path to the settings.yaml file.
+    """
+    data = read_settings_file(settings_file)
+    if "providers" not in data:
+        data["providers"] = {}
+    data["providers"][service] = key
+    write_settings_file(settings_file, data)
+    print(f"Added provider '{service}'.")
+
+
+@providers_app.command("list")
+def providers_list(
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """List all providers.
+
+    Args:
+        settings_file: Path to the settings.yaml file.
+    """
+    data = read_settings_file(settings_file)
+    settings = Settings.from_dict(data)
+
+    if not settings.providers:
+        print("No providers configured.")
+        return
+
+    print("Providers:")
+    for provider_name, api_key in settings.providers.items():
+        masked_key = api_key[:4] + "..." if len(api_key) > 4 else "***"
+        print(f"  {provider_name}: {masked_key}")
+
+
+@providers_app.command("delete")
+def providers_delete(
+    service: str = typer.Argument(..., help="Service name to delete"),
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """Delete a provider.
+
+    Args:
+        service: Service name.
+        settings_file: Path to the settings.yaml file.
+
+    Raises:
+        BadParameter: If the provider is not found.
+    """
+    data = read_settings_file(settings_file)
+    if "providers" not in data or service not in data["providers"]:
+        raise BadParameter(f"Provider '{service}' not found.")
+
+    del data["providers"][service]
+    write_settings_file(settings_file, data)
+    print(f"Deleted provider '{service}'.")
+
+
+# ---------- Layout commands (sub-command of settings) ----------
+
+
+layout_app = typer.Typer(no_args_is_help=True)
+settings_app.add_typer(layout_app, name="layout")
+
+
+@layout_app.command("set")
+def layout_set(
+    group: str = typer.Argument(..., help="Group name"),
+    style: Optional[str] = typer.Option(None, help="Layout style"),
+    columns: Optional[int] = typer.Option(None, help="Number of columns"),
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """Set layout configuration for a group.
+
+    Args:
+        group: Group name.
+        style: Layout style (e.g., row, column).
+        columns: Number of columns.
+        settings_file: Path to the settings.yaml file.
+    """
+    data = read_settings_file(settings_file)
+    if "layout" not in data:
+        data["layout"] = {}
+    if group not in data["layout"]:
+        data["layout"][group] = {}
+    if style is not None:
+        data["layout"][group]["style"] = style
+    if columns is not None:
+        data["layout"][group]["columns"] = columns
+    write_settings_file(settings_file, data)
+    print(f"Updated layout for group '{group}'.")
+
+
+@layout_app.command("list")
+def layout_list(
+    settings_file: Path = typer.Option(
+        DEFAULT_SETTINGS_FILE, help="Path to settings.yaml"
+    ),
+) -> None:
+    """List all layout configurations.
+
+    Args:
+        settings_file: Path to the settings.yaml file.
+    """
+    data = read_settings_file(settings_file)
+    settings = Settings.from_dict(data)
+
+    if not settings.layout:
+        print("No layout configurations found.")
+        return
+
+    print("Layout configurations:")
+    for group_name, layout in settings.layout.items():
+        print(f"  {group_name}:")
+        if layout.style:
+            print(f"    style: {layout.style}")
+        if layout.columns:
+            print(f"    columns: {layout.columns}")
+
+
+# ---------- Docker commands ----------
+
+
+@docker_app.command("validate")
+def docker_validate(
+    docker_file: Path = typer.Option(
+        DEFAULT_DOCKER_FILE, help="Path to docker.yaml"
+    ),
+) -> None:
+    """Validate that docker.yaml matches the expected structure.
+
+    Args:
+        docker_file: Path to the docker.yaml file to validate.
+    """
+    errors = validate_docker_file(docker_file)
+
+    if errors:
+        print("Validation failed:")
+        for e in errors:
+            print(f"- {e}")
+        raise Exit(code=2)
+
+    print("OK: docker.yaml structure looks valid.")
+
+
+@docker_app.command("list")
+def docker_list(
+    docker_file: Path = typer.Option(
+        DEFAULT_DOCKER_FILE, help="Path to docker.yaml"
+    ),
+) -> None:
+    """List all Docker instances.
+
+    Args:
+        docker_file: Path to the docker.yaml file.
+    """
+    data = read_docker_file(docker_file)
+    print_docker_instances(data)
+
+
+@docker_app.command("add")
+def docker_add(
+    name: str = typer.Argument(..., help="Docker instance name"),
+    host: Optional[str] = typer.Option(None, help="Docker host"),
+    port: Optional[int] = typer.Option(None, help="Docker port"),
+    socket: Optional[str] = typer.Option(None, help="Docker socket path"),
+    docker_file: Path = typer.Option(
+        DEFAULT_DOCKER_FILE, help="Path to docker.yaml"
+    ),
+) -> None:
+    """Add a new Docker instance.
+
+    Args:
+        name: Docker instance name.
+        host: Docker host (use with port).
+        port: Docker port (use with host).
+        socket: Docker socket path (use instead of host+port).
+        docker_file: Path to the docker.yaml file.
+
+    Raises:
+        BadParameter: If the instance name already exists or invalid configuration.
+    """
+    data = read_docker_file(docker_file)
+
+    if name in data:
+        raise BadParameter(f"Docker instance '{name}' already exists.")
+
+    # Validate configuration
+    has_host_port = host is not None and port is not None
+    has_socket = socket is not None
+
+    if not (has_host_port or has_socket):
+        raise BadParameter(
+            "Must specify either --host and --port together, or --socket."
+        )
+
+    if has_host_port and has_socket:
+        raise BadParameter("Cannot specify both host+port and socket.")
+
+    config: dict[str, any] = {}
+    if host:
+        config["host"] = host
+    if port:
+        config["port"] = port
+    if socket:
+        config["socket"] = socket
+
+    data[name] = config
+    write_docker_file(docker_file, data)
+    print(f"Added Docker instance '{name}'.")
+
+
+@docker_app.command("show")
+def docker_show(
+    name: str = typer.Argument(..., help="Docker instance name"),
+    docker_file: Path = typer.Option(
+        DEFAULT_DOCKER_FILE, help="Path to docker.yaml"
+    ),
+) -> None:
+    """Show detailed information about a Docker instance.
+
+    Args:
+        name: Docker instance name.
+        docker_file: Path to the docker.yaml file.
+
+    Raises:
+        BadParameter: If the instance is not found.
+    """
+    data = read_docker_file(docker_file)
+    instance_name = find_docker_instance(data, name)
+
+    if not instance_name:
+        raise BadParameter(f"Docker instance '{name}' not found.")
+
+    instance_config = data[instance_name]
+    print(f"Docker instance: {instance_name}")
+    if isinstance(instance_config, dict):
+        for key, value in instance_config.items():
+            print(f"- {key}: {value}")
+
+
+@docker_app.command("update")
+def docker_update(
+    name: str = typer.Argument(..., help="Docker instance name"),
+    host: Optional[str] = typer.Option(None, help="New Docker host"),
+    port: Optional[int] = typer.Option(None, help="New Docker port"),
+    socket: Optional[str] = typer.Option(None, help="New Docker socket path"),
+    docker_file: Path = typer.Option(
+        DEFAULT_DOCKER_FILE, help="Path to docker.yaml"
+    ),
+) -> None:
+    """Update a Docker instance's configuration.
+
+    Args:
+        name: Docker instance name.
+        host: New Docker host.
+        port: New Docker port.
+        socket: New Docker socket path.
+        docker_file: Path to the docker.yaml file.
+
+    Raises:
+        BadParameter: If the instance is not found or invalid configuration.
+    """
+    data = read_docker_file(docker_file)
+    instance_name = find_docker_instance(data, name)
+
+    if not instance_name:
+        raise BadParameter(f"Docker instance '{name}' not found.")
+
+    instance_config = data[instance_name]
+    if not isinstance(instance_config, dict):
+        raise BadParameter(f"Instance '{name}' has invalid configuration.")
+
+    # Validate updated configuration
+    current_has_socket = "socket" in instance_config
+    new_has_host_port = host is not None or port is not None
+    new_has_socket = socket is not None
+
+    if new_has_host_port and new_has_socket:
+        raise BadParameter("Cannot specify both host+port and socket.")
+
+    if current_has_socket and (host or port):
+        raise BadParameter(
+            "Cannot switch from socket to host+port. Delete and recreate the instance."
+        )
+    if not current_has_socket and socket:
+        raise BadParameter(
+            "Cannot switch from host+port to socket. Delete and recreate the instance."
+        )
+
+    if host is not None:
+        instance_config["host"] = host
+    if port is not None:
+        instance_config["port"] = port
+    if socket is not None:
+        instance_config["socket"] = socket
+
+    write_docker_file(docker_file, data)
+    print(f"Updated Docker instance '{name}'.")
+
+
+@docker_app.command("delete")
+def docker_delete(
+    name: str = typer.Argument(..., help="Docker instance name"),
+    docker_file: Path = typer.Option(
+        DEFAULT_DOCKER_FILE, help="Path to docker.yaml"
+    ),
+) -> None:
+    """Delete a Docker instance.
+
+    Args:
+        name: Docker instance name.
+        docker_file: Path to the docker.yaml file.
+
+    Raises:
+        BadParameter: If the instance is not found.
+    """
+    data = read_docker_file(docker_file)
+    instance_name = find_docker_instance(data, name)
+
+    if not instance_name:
+        raise BadParameter(f"Docker instance '{name}' not found.")
+
+    del data[instance_name]
+    write_docker_file(docker_file, data)
+    print(f"Deleted Docker instance '{name}'.")
 
 
 # ---------- Entry point ----------

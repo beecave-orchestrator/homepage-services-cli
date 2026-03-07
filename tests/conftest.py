@@ -100,3 +100,131 @@ def sample_icon_file(tmp_path: Path, sample_png_icon: bytes) -> Path:
     icon_file = tmp_path / "icon.png"
     icon_file.write_bytes(sample_png_icon)
     return icon_file
+
+
+# Bookmarks fixtures
+
+
+@pytest.fixture
+def sample_bookmarks_content() -> str:
+    """Return a sample bookmarks.yaml content.
+
+    Returns:
+        YAML content string.
+    """
+    return """
+- Developer:
+    - GitHub:
+        abbr: GH
+        href: https://github.com/
+        description: Code hosting platform
+
+    - Stack Overflow:
+        abbr: SO
+        href: https://stackoverflow.com/
+
+- Social:
+    - Reddit:
+        icon: reddit.png
+        href: https://reddit.com/
+        description: The front page of the internet
+"""
+
+
+@pytest.fixture
+def sample_bookmarks_file(
+    tmp_path: Path, sample_bookmarks_content: str
+) -> Generator[Path, None, None]:
+    """Create a temporary bookmarks.yaml file with sample content.
+
+    Args:
+        tmp_path: Temporary directory path.
+        sample_bookmarks_content: Sample YAML content.
+
+    Yields:
+        Path to the temporary bookmarks.yaml file.
+    """
+    bookmarks_file = tmp_path / "bookmarks.yaml"
+    bookmarks_file.write_text(sample_bookmarks_content)
+    yield bookmarks_file
+
+
+# Settings fixtures
+
+
+@pytest.fixture
+def sample_settings_content() -> str:
+    """Return a sample settings.yaml content.
+
+    Returns:
+        YAML content string.
+    """
+    return """
+title: My Awesome Homepage
+theme: dark
+color: slate
+layout:
+  Proxmox:
+    style: row
+    columns: 5
+  Media:
+    style: column
+providers:
+  openweathermap: api-key-here
+  weatherapi: another-api-key
+"""
+
+
+@pytest.fixture
+def sample_settings_file(
+    tmp_path: Path, sample_settings_content: str
+) -> Generator[Path, None, None]:
+    """Create a temporary settings.yaml file with sample content.
+
+    Args:
+        tmp_path: Temporary directory path.
+        sample_settings_content: Sample YAML content.
+
+    Yields:
+        Path to the temporary settings.yaml file.
+    """
+    settings_file = tmp_path / "settings.yaml"
+    settings_file.write_text(sample_settings_content)
+    yield settings_file
+
+
+# Docker fixtures
+
+
+@pytest.fixture
+def sample_docker_content() -> str:
+    """Return a sample docker.yaml content.
+
+    Returns:
+        YAML content string.
+    """
+    return """
+my-docker:
+  host: 127.0.0.1
+  port: 2375
+other-docker:
+  socket: /var/run/docker.sock
+"""
+
+
+@pytest.fixture
+def sample_docker_file(
+    tmp_path: Path, sample_docker_content: str
+) -> Generator[Path, None, None]:
+    """Create a temporary docker.yaml file with sample content.
+
+    Args:
+        tmp_path: Temporary directory path.
+        sample_docker_content: Sample YAML content.
+
+    Yields:
+        Path to the temporary docker.yaml file.
+    """
+    docker_file = tmp_path / "docker.yaml"
+    docker_file.write_text(sample_docker_content)
+    yield docker_file
