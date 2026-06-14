@@ -1,0 +1,197 @@
+# For configuration options and examples please see:
+# https://github.com/benphelps/homepage/wiki/Services
+
+- Proxmox:
+    - PVE 'essentials-node':
+        icon: proxmox.png
+        href: https://192.168.2.203:8006
+        description: Smart-Home and cloud services
+    - PVE 'main-node':
+        icon: proxmox.png
+        href: https://192.168.2.191:8006
+        description: Smart-Home and cloud services
+    - PVE 'network-node':
+        icon: proxmox.png
+        href: https://192.168.2.202:8006
+        description: Networking services
+    - PVE 'storage-node'':
+        icon: proxmox.png
+        href: https://192.168.2.190:8006
+        description: Storage and testing services
+    - Proxmox 'Backup Server':
+        icon: proxmox.png
+        href: https://192.168.2.199:8007
+        description: Backup server for PVE nodes
+
+- AI:
+    - Insanely Fast Whisper:
+        icon: /icons/insanely-fast-whisper.png
+        href: http://192.168.2.110:7860
+        description: Fast speech-to-text transcription
+    - Parakeet ROCm:
+        icon: /icons/parakeet-nemo-icon.png
+        href: http://192.168.2.110:7861
+        description: Fast speech-to-text transcription
+    - Open WebUI:
+        icon: /icons/open-webui.png
+        href: http://192.168.2.110:3000
+        description: Offline, feature-rich, extensible WebUI
+
+- Smart Home:
+    - Home Assistant 'Prod':
+        icon: home-assistant.png
+        href: https://ha.beecave.nl
+        description: The main Home Assistant server
+    - Home Assistant 'Test':
+        icon: home-assistant.png
+        href: http://192.168.2.20:8123
+        description: Home Assistant test server
+    - Zigbee2mqtt:
+        icon: zigbee2mqtt.png
+        href: http://192.168.2.152:9442
+        description: Zigbee network controller
+    - Scrypted:
+        icon: scrypted.png
+        href: https://192.168.2.169:10443
+        description: Use IP cameras in HomeKit
+    - ESPHome:
+        icon: esphome.png
+        href: http://192.168.2.171:6052
+        description: ESPHome webui
+
+- Network:
+    - pi-hole:
+        icon: pi-hole.png
+        href: http://192.168.2.200/admin
+        description: Recursive DNS with unbound and adblocking.
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: http://192.168.2.184:3001
+        description: Check if hosts are up
+    - Omada:
+        icon: omada.png
+        href: https://192.168.2.10:8043
+        description: Omada software controller
+    - Crowdsec:
+        icon: crowdsec.png
+        href: https://192.168.2.175
+        description: Crowsec Security Client
+    - Speed Test:
+        icon: openspeedtest.png
+        href: http://192.168.2.186:5216
+        description: Self hosted speedtest service
+    - Netboot:
+        icon: netboot.png
+        href: http://192.168.2.185:3000
+        description: Netboot webui
+
+- Download and Convert:
+    - Qbittorrent-nox:
+        icon: qbittorrent.png
+        href: http://192.168.2.192:8090
+        description: Torrent server
+    - Qbittorrent-nox (ao):
+        icon: qbittorrent.png
+        href: http://192.168.2.223:8090
+        description: Torrent server that is always on
+    - Handbrake:
+        icon: handbrake.png
+        href: http://192.168.2.130:5800
+        description: Convert mediafiles to different formats
+
+- Arrs:
+    - Bazarr:
+        icon: bazarr.png
+        href: http://192.168.2.41:6767
+        description: Automatic subtitle downloader for Sonarr and Radarr
+    - Lidarr:
+        icon: lidarr.png
+        href: http://192.168.2.42:8686
+        description: Automatic music downloader for usenet and torrents
+    - Prowlarr:
+        icon: prowlarr.png
+        href: http://192.168.2.43:9696
+        description: Automatic indexing of usenet and torrent trackers
+    - Radarr:
+        icon: radarr.png
+        href: http://192.168.2.44:7878
+        description: Automatic movie downloader for usenet and torrents
+    - Readarr:
+        icon: readarr.png
+        href: http://192.168.2.45:8787
+        description: Automatic e-book downloader for usenet and torrents
+    - Sonarr:
+        icon: sonarr.png
+        href: http://192.168.2.46:8989
+        description: Automatic series downloader for usenet and torrents
+    - Tdarr:
+        icon: tdarr.png
+        href: http://192.168.2.47:8265
+        description: Automatic transcoder for Radarr and Sonarr
+    - Whisparr:
+        icon: whisparr.png
+        href: http://192.168.2.48:6969
+        description: Automatic xxx downloader for usenet and torrents
+
+- Storage:
+    - Truenas:
+        icon: truenas.png
+        href: https://192.168.2.195
+        description: Storage server
+    - Nextcloud:
+        icon: nextcloud.png
+        href: https://192.168.2.175
+    - Pingvin:
+        icon: pingvin.png
+        href: https://transfer.beecave.nl
+        description: Transfer, share and request files safely.
+
+- Mediaplayer and photo's:
+    - Plex:
+        icon: plex.png
+        href: http://192.168.2.194:32400/web
+        description: Plex Media Server
+    - Jellyfin:
+        icon: jellyfin.png
+        href: http://192.168.2.22:8096
+        description: Jellyfin Media Server for the family
+    - Jellyfin-PM:
+        icon: jellyfin.png
+        href: http://192.168.2.24:8096
+        description: Jellyfin Media Server for PM
+    - Photoprism:
+        icon: photoprism.png
+        href: http://192.168.2.135:2342
+        description: Photo collection with person recognition.
+
+- Other:
+    - Planka:
+        icon: planka.png
+        href: http://192.168.2.56:3000
+        description: Kaban project board
+    - Excalidraw:
+        icon: excalidraw.png
+        href: http://192.168.2.51:3000
+        description: Virtual collaborative whiteboard and diagrams tool.
+    - Whoogle:
+        icon: whooglesearch.png
+        href: http://192.168.2.197:5000
+        description: Private search engine
+    - Olivetin:
+        icon: olivetin.png
+        href: http://192.168.2.179:1337
+        description: Command and control dashboard
+    - Slimme Lezer:
+        icon: https://www.zuidwijk.com/wp-content/uploads/2020/12/cropped-Logo-MZuidwijk.com_-1-1.png
+        href: http://192.168.0.2/home.html
+        description: Electricity and gas consumption meter
+
+- Games:
+    - EmulatorJS:
+        icon: emulatorjs.png
+        href: http://192.168.2.183
+        description: Retroarch emulator running in a Javascript webapp
+    - Turnkey-Gameserver:
+        icon: turnkey-gameserver.png
+        href: ""
+        description: Turnkey gameserver for MineOS
