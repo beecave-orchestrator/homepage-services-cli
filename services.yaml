@@ -84,6 +84,14 @@
         icon: netboot.png
         href: http://192.168.2.185:3000
         description: Netboot webui
+    - Nginx Proxy Manager:
+        icon: nginx-proxy-manager.png
+        href: http://192.168.2.63:81
+        description: Reverse proxy management with SSL and access lists
+    - SearXNG:
+        icon: searxng.png
+        href: http://192.168.2.7:8888
+        description: Privacy-respecting metasearch engine
 
 - Download and Convert:
     - Qbittorrent-nox:
@@ -98,6 +106,18 @@
         icon: handbrake.png
         href: http://192.168.2.130:5800
         description: Convert mediafiles to different formats
+    - MeTube:
+        icon: metube.png
+        href: http://192.168.2.180:8081
+        description: YouTube video downloader web UI
+    - Vid2GIF:
+        icon: video.png
+        href: http://192.168.2.181:8080
+        description: Convert video files to animated GIFs
+    - SRT Pipeline:
+        icon: subtitle-edit.png
+        href: http://192.168.2.30:8000
+        description: Subtitle processing and conversion pipeline
 
 - Arrs:
     - Bazarr:
@@ -185,6 +205,30 @@
         icon: https://www.zuidwijk.com/wp-content/uploads/2020/12/cropped-Logo-MZuidwijk.com_-1-1.png
         href: http://192.168.0.2/home.html
         description: Electricity and gas consumption meter
+    - Linkwarden:
+        icon: linkwarden.png
+        href: http://192.168.2.21:3000
+        description: Self-hosted bookmark manager
+    - Wish This:
+        icon: wishlist.png
+        href: http://192.168.2.16
+        description: Wishlist and gift registry platform
+    - Gogs:
+        icon: gogs.png
+        href: http://192.168.2.88:3000
+        description: Self-hosted Git service
+    - Rallly:
+        icon: rallly.png
+        href: http://192.168.2.67:3000
+        description: Meeting scheduling and poll tool
+    - Qdrant:
+        icon: qdrant.png
+        href: http://192.168.2.18:6333/dashboard
+        description: Vector database for AI and search applications
+    - Nedap Docs Proxy:
+        icon: nginx.png
+        href: http://192.168.2.112:8000
+        description: Documentation proxy service
 
 - Games:
     - EmulatorJS:
@@ -195,221 +239,3 @@
         icon: turnkey-gameserver.png
         href: ""
         description: Turnkey gameserver for MineOS
-
-- Proxmox guests:
-    - 101 local-ai (qemu):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox QEMU guest 101 on pve-storage
-    - 102 netboot-xyz (qemu):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox QEMU guest 102 on pve-storage
-    - 103 hermes-agent (qemu):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox QEMU guest 103 on pve-storage
-    - 104 truenas-core (qemu):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox QEMU guest 104 on pve-storage
-    - 250 homeassistant (qemu):
-        icon: proxmox.png
-        href: https://192.168.2.191:8006
-        description: Running Proxmox QEMU guest 250 on pve-main
-    - 500 sanitize-text (qemu):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox QEMU guest 500 on pve-essentials
-    - 120 photoprism (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 120 on pve-storage
-    - 121 esphome (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 121 on pve-storage
-    - 123 myspeed (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 123 on pve-storage
-    - 129 metube (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 129 on pve-storage
-    - 130 searxng (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 130 on pve-storage
-    - 131 handbrake (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 131 on pve-storage
-    - 133 plex (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 133 on pve-storage
-    - 135 qbittorrent (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 135 on pve-storage
-    - 137 bazarr (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 137 on pve-storage
-    - 138 lidarr (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 138 on pve-storage
-    - 139 prowlarr (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 139 on pve-storage
-    - 140 radarr (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 140 on pve-storage
-    - 141 readarr (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 141 on pve-storage
-    - 142 sonarr (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 142 on pve-storage
-    - 144 whisparr (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.190:8006
-        description: Running Proxmox LXC guest 144 on pve-storage
-    - 201 olivetin (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.191:8006
-        description: Running Proxmox LXC guest 201 on pve-main
-    - 202 scrypted (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.191:8006
-        description: Running Proxmox LXC guest 202 on pve-main
-    - 204 zigbee2mqtt (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.191:8006
-        description: Running Proxmox LXC guest 204 on pve-main
-    - 205 planka (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.191:8006
-        description: Running Proxmox LXC guest 205 on pve-main
-    - 206 piper-tts (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.191:8006
-        description: Running Proxmox LXC guest 206 on pve-main
-    - 207 airconnect (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.191:8006
-        description: Running Proxmox LXC guest 207 on pve-main
-    - 300 pi-hole (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 300 on pve-network
-    - 301 cloudflared (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 301 on pve-network
-    - 302 homepage-local (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 302 on pve-network
-    - 303 uptimekuma (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 303 on pve-network
-    - 304 nginx-proxy-manager (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 304 on pve-network
-    - 309 whoogle (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 309 on pve-network
-    - 310 mqtt (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 310 on pve-network
-    - 311 nextcloudpi (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 311 on pve-network
-    - 312 pingvin-ao (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.202:8006
-        description: Running Proxmox LXC guest 312 on pve-network
-    - 405 excalidraw (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 405 on pve-essentials
-    - 407 jellyfin-pm (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 407 on pve-essentials
-    - 409 nedap-docs-proxy (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 409 on pve-essentials
-    - 411 SMB-fileserver (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 411 on pve-essentials
-    - 414 linkwarden (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 414 on pve-essentials
-    - 416 wish-this (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 416 on pve-essentials
-    - 417 gogs (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 417 on pve-essentials
-    - 418 qbittorrent-ao (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 418 on pve-essentials
-    - 420 rallly (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 420 on pve-essentials
-    - 421 alpine-vaultwarden (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 421 on pve-essentials
-    - 424 namer (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 424 on pve-essentials
-    - 428 blog (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 428 on pve-essentials
-    - 429 qdrant (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 429 on pve-essentials
-    - 430 vid2gif (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 430 on pve-essentials
-    - 431 vid2audio (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 431 on pve-essentials
-    - 433 srt-pipeline (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 433 on pve-essentials
-    - 434 git-gains (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 434 on pve-essentials
-    - 435 proxmox-pwa (lxc):
-        icon: proxmox.png
-        href: https://192.168.2.203:8006
-        description: Running Proxmox LXC guest 435 on pve-essentials
