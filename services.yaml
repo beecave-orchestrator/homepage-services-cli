@@ -29,7 +29,7 @@
         href: http://192.168.2.110:7860
         description: Fast speech-to-text transcription
     - Parakeet ROCm:
-        icon: /icons/parakeet-nemo-icon.png
+        icon: /icons/nemo-parakeet.png
         href: http://192.168.2.110:7861
         description: Fast speech-to-text transcription
     - Open WebUI:
@@ -111,11 +111,11 @@
         href: http://192.168.2.180:8081
         description: YouTube video downloader web UI
     - Vid2GIF:
-        icon: video.png
+        icon: /icons/vid2gif.png
         href: http://192.168.2.181:8080
         description: Convert video files to animated GIFs
     - SRT Pipeline:
-        icon: subtitle-edit.png
+        icon: /icons/srt-pipeline.png
         href: http://192.168.2.30:8000
         description: Subtitle processing and conversion pipeline
 
